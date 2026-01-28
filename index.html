@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIREON CREATOR AGENCY | Space-Age Talent Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-deep: #020205;
+            --accent-cyan: #00f2ff;
+            --accent-purple: #bc13fe;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-white: #ffffff;
+            --text-dim: #94a3b8;
+            --gradient-main: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            --transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        
+        body { 
+            background-color: var(--bg-deep); 
+            color: var(--text-white); 
+            line-height: 1.6; 
+            overflow-x: hidden; 
+        }
+
+        /* --- DYNAMIC BACKGROUND ANIMATION --- */
+        .bg-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(2, 2, 5, 0.8), rgba(2, 2, 5, 0.8)), url('image_209cc0.png');
+            background-size: cover; background-position: center;
+            z-index: -2; animation: bgZoom 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes bgZoom {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .stars-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.05) 0%, transparent 50%);
+            z-index: -1; pointer-events: none;
+        }
+
+        /* --- NAVBAR --- */
+        nav { 
+            position: fixed; top: 0; width: 100%; padding: 1.2rem 8%; 
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 1000; background: rgba(2, 2, 5, 0.7); 
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+
+        .vireon-brand { display: flex; align-items: center; gap: 15px; text-decoration: none; }
+        .logo-img { height: 45px; width: auto; filter: drop-shadow(0 0 10px var(--accent-cyan)); transition: 0.3s; }
+        .logo-img:hover { transform: rotate(10deg) scale(1.1); }
+        .logo-name { font-size: 1.8rem; font-weight: 800; letter-spacing: 3px; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
+
+        .nav-links { display: flex; list-style: none; gap: 2.5rem; }
+        .nav-links a { text-decoration: none; color: var(--text-dim); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; transition: var(--transition); position: relative; }
+        .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--gradient-main); transition: 0.3s; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a:hover { color: var(--text-white); }
+
+        /* --- HERO --- */
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            text-align: center; padding: 0 10%; position: relative;
+        }
+
+        .hero h1 { 
+            font-size: clamp(3rem, 10vw, 6rem); font-weight: 800; line-height: 1.1; 
+            margin: 20px 0; animation: fadeInUp 1s ease 0.2s both;
+        }
+        .hero h1 span { background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .btn { 
+            padding: 1.2rem 2.8rem; border-radius: 50px; font-weight: 700; text-transform: uppercase; 
+            font-size: 0.85rem; letter-spacing: 2px; transition: var(--transition); 
+            cursor: pointer; border: none; display: inline-block; text-decoration: none; overflow: hidden; position: relative;
+        }
+        .btn-primary { background: var(--gradient-main); color: #000; box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); }
+        .btn-primary:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 0 50px rgba(188, 19, 254, 0.5); }
+        
+        .btn-outline { 
+            border: 1px solid var(--accent-cyan); color: var(--text-white); 
+            background: rgba(0, 242, 255, 0.05); margin-left: 1rem; backdrop-filter: blur(10px);
+        }
+        .btn-outline:hover { background: var(--accent-cyan); color: #000; }
+
+        /* --- REVEAL ANIMATIONS --- */
+        .reveal { opacity: 0; transform: translateY(50px); transition: var(--transition); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- CARDS & GRIDS --- */
+        section { padding: 120px 10% 80px; }
+        .section-header { text-align: center; margin-bottom: 5rem; }
+        .section-header h2 { font-size: 3.5rem; letter-spacing: -1px; }
+
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; }
+        
+        .glass-card { 
+            background: var(--glass); border: 1px solid var(--glass-border); 
+            padding: 4rem 2rem; border-radius: 40px; text-align: center; 
+            transition: var(--transition); backdrop-filter: blur(15px);
+            position: relative; overflow: hidden;
+            height: 100%;
+        }
+        .glass-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
+            opacity: 0; transition: 0.5s;
+        }
+        .glass-card:hover::before { opacity: 1; }
+        .glass-card:hover { border-color: var(--accent-cyan); transform: translateY(-15px) scale(1.02); }
+        
+        .glass-card i { font-size: 3rem; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 2rem; display: inline-block; }
+
+        /* NEW: Creator Link Wrapper Styles */
+        .creator-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        /* --- CONTACT --- */
+        .contact-wrap { 
+            display: grid; grid-template-columns: 1fr 1.2fr; background: rgba(255,255,255,0.02); 
+            border: 1px solid var(--glass-border); border-radius: 60px; overflow: hidden; backdrop-filter: blur(20px);
+        }
+        .contact-info { padding: 5rem; background: var(--gradient-main); color: #000; position: relative; }
+        .contact-form { padding: 5rem; }
+        .input-box { 
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); 
+            padding: 1.5rem; border-radius: 25px; color: white; margin-bottom: 1.5rem; outline: none; transition: 0.3s;
+        }
+        .input-box:focus { border-color: var(--accent-cyan); background: rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(0,242,255,0.2); }
+
+        /* --- FOOTER --- */
+        footer { padding: 100px 10% 50px; text-align: center; border-top: 1px solid var(--glass-border); }
+        .social-links { display: flex; justify-content: center; gap: 3rem; margin: 3rem 0; }
+        .social-icon { 
+            font-size: 2rem; color: var(--text-dim); transition: var(--transition); 
+            width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; border: 1px solid var(--glass-border);
+        }
+        .social-icon:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); transform: rotate(360deg) scale(1.2); box-shadow: 0 0 20px var(--accent-cyan); }
+
+        @media (max-width: 992px) { 
+            .contact-wrap { grid-template-columns: 1fr; } 
+            .nav-links { display: none; }
+            .contact-info, .contact-form { padding: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-container"></div>
+    <div class="stars-overlay"></div>
+
+    <nav>
+        <a href="#home" class="vireon-brand">
+            <img src="logo.png" alt="Vireon" class="logo-img">
+            <span class="logo-name">Vireon</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">Philosophy</a></li>
+            <li><a href="#creators">Talent</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero" id="home">
+        <p class="reveal active" style="color: var(--accent-cyan); letter-spacing: 8px; font-weight: 800; text-transform: uppercase;">Established 2024</p>
+        <h1 class="reveal active">Influence Into <br><span>Galactic Impact</span></h1>
+        <p class="reveal active" style="max-width: 800px; color: #cbd5e1; font-size: 1.2rem; margin-top: 20px;">We engineering digital legacies. Connecting elite brands with the next evolution of icons through quantum-grade strategy.</p>
+        <div class="reveal active" style="margin-top: 50px;">
+            <a href="#contact" class="btn btn-primary">Start Campaign</a>
+            <a href="#creators" class="btn btn-outline">Meet the Roster</a>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="section-header reveal">
+            <p style="color: var(--accent-cyan); font-weight: 800; letter-spacing: 4px; margin-bottom: 1rem;">OUR CORE</p>
+            <h2>The Growth Ecosystem</h2>
+        </div>
+        <div class="grid-layout">
+            <div class="glass-card reveal">
+                <i class="fas fa-microchip"></i>
+                <h3>Brand Strategy</h3>
+                <p style="color: var(--text-dim);">Custom-built narrative arcs that ensure every partnership feels high-value and perfectly aligned.</p>
+            </div>
+            <div class="glass-card reveal">
+                <i class="fas fa-atom"></i>
+                <h3>Quantum Analytics</h3>
+                <p style="color: var(--text-dim);">Moving beyond vanity metrics with deep-data intelligence to track true sentiment and ROI.</p>
+            </div>
+            <div class="glass-card reveal">
+                <i class="fas fa-crown"></i>
+                <h3>Elite Management</h3>
+                <p style="color: var(--text-dim);">360° support from legal negotiation to content optimization and multi-platform scaling.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="creators">
+        <div class="section-header reveal">
+            <p style="color: var(--accent-cyan); font-weight: 800; letter-spacing: 4px; margin-bottom: 1rem;">ELITE ROSTER</p>
+            <h2>Top Tier Talent</h2>
+        </div>
+        <div class="grid-layout">
+            
+            <a href="https://youtube.com/@CyberVortex" target="_blank" class="creator-link">
+                <div class="glass-card reveal">
+                    <i class="fas fa-gamepad"></i>
+                    <h3>Flustoo</h3>
+                    <p style="color: var(--accent-cyan); font-weight: 800;">GAMING | 67k+</p>
+                </div>
+            </a>
+
+            <a href="https://youtube.com/@AriaNova" target="_blank" class="creator-link">
+                <div class="glass-card reveal">
+                    <i class="fas fa-camera"></i>
+                    <h3>Aria Nova</h3>
+                    <p style="color: var(--accent-cyan); font-weight: 800;">LIFESTYLE | 1.8M+</p>
+                </div>
+            </a>
+
+            <a href="https://youtube.com/@CryptoSage" target="_blank" class="creator-link">
+                <div class="glass-card reveal">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Crypto Sage</h3>
+                    <p style="color: var(--accent-cyan); font-weight: 800;">FINTECH | 900K+</p>
+                </div>
+            </a>
+
+            <a href="https://youtube.com/@TitanForce" target="_blank" class="creator-link">
+                <div class="glass-card reveal">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Titan Force</h3>
+                    <p style="color: var(--accent-cyan); font-weight: 800;">FITNESS | 3.1M+</p>
+                </div>
+            </a>
+
+            <a href="https://youtube.com/@ZenithWanders" target="_blank" class="creator-link">
+                <div class="glass-card reveal">
+                    <i class="fas fa-plane"></i>
+                    <h3>Zenith Wanders</h3>
+                    <p style="color: var(--accent-cyan); font-weight: 800;">TRAVEL | 1.2M+</p>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="contact-wrap reveal">
+            <div class="contact-info">
+                <h2 style="font-size: 3.5rem; line-height: 1; margin-bottom: 2rem;">Ready to Launch?</h2>
+                <p style="font-size: 1.2rem; font-weight: 600;">Let’s create something legendary. Mission Control is waiting.</p>
+                <div style="margin-top: 5rem;">
+                    <p style="font-size: 0.8rem; letter-spacing: 3px; font-weight: 800;">DIRECT CONTACT</p>
+                    <p style="font-size: 1.5rem; font-weight: 800;">p297gandhi@gmail.com</p>
+                </div>
+            </div>
+            <div class="contact-form">
+                <form id="vireonEmailForm">
+                    <input type="text" id="userName" class="input-box" placeholder="Professional Name" required>
+                    <input type="email" id="userEmail" class="input-box" placeholder="Business Email" required>
+                    <textarea id="userMessage" class="input-box" rows="5" placeholder="Tell us about your mission..." required></textarea>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Initialize Mission</button>
+                </form>
+            </div>
+        </div>
+    </section>
+<div id="enter-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;">
+    <img src="logo.png" style="width: 120px; margin-bottom: 20px; filter: drop-shadow(0 0 15px var(--primary-green));">
+    <h2 style="font-family: 'Oswald'; color: #fff; letter-spacing: 3px;">CLICK TO ENTER</h2>
+    <p style="color: var(--primary-green); font-size: 0.7rem; margin-top: 10px; font-weight: bold;">[ MUSIC WILL ENABLE ]</p>
+</div>
+
+<div id="music-control" style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: none;">
+    <button onclick="toggleMute()" id="mute-btn" style="background: rgba(0,0,0,0.8); border: 1px solid var(--primary-green); color: var(--primary-green); padding: 12px; border-radius: 50%; cursor: pointer; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: var(--glow-shadow);">
+        <i id="mute-icon" class="fas fa-volume-up"></i>
+    </button>
+</div>
+
+<audio id="bg-music" loop>
+    <source src="ReelAudio-33862.mp3" type="audio/mpeg">
+</audio>
+    <footer>
+        <div class="vireon-brand" style="justify-content: center;">
+            <img src="logo.png" alt="Vireon" class="logo-img">
+            <span class="logo-name" style="font-size: 2.5rem;">Vireon</span>
+        </div>
+        
+        <div class="social-links">
+            <a href="https://instagram.com/" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+            <a href="https://discord.com/" target="_blank" class="social-icon"><i class="fab fa-discord"></i></a>
+        </div>
+
+        <p style="color: var(--text-dim); font-size: 0.8rem; letter-spacing: 5px; font-weight: 600; text-transform: uppercase;">&copy; 2024 VIREON CREATOR AGENCY. ALL SYSTEMS OPERATIONAL.</p>
+    </footer>
+
+    <script>
+const music = document.getElementById('bg-music');
+const overlay = document.getElementById('enter-overlay');
+const control = document.getElementById('music-control');
+const muteIcon = document.getElementById('mute-icon');
+
+// Enter click par music start
+overlay.addEventListener('click', function() {
+    music.play().catch(e => console.log("Autoplay blocked"));
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        control.style.display = 'block'; // Mute button tabhi dikhega jab enter ho jaye
+    }, 500);
+});
+
+// Mute/Unmute function
+function toggleMute() {
+    if (music.muted) {
+        music.muted = false;
+        muteIcon.className = 'fas fa-volume-up';
+        muteIcon.style.color = 'var(--primary-green)';
+    } else {
+        music.muted = true;
+        muteIcon.className = 'fas fa-volume-mute';
+        muteIcon.style.color = '#ff4444'; // Off hone par red dikhega
+    }
+}
+        // Smooth Reveal on Scroll
+        const observerOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Form to Gmail Redirect
+        document.getElementById('vireonEmailForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const msg = document.getElementById('userMessage').value;
+            const subject = encodeURIComponent(`Vireon Mission Inquiry: ${name}`);
+            const body = encodeURIComponent(`Professional Name: ${name}\nEmail: ${email}\n\nMission Detail:\n${msg}`);
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=p297gandhi@gmail.com&su=${subject}&body=${body}`;
+            window.open(gmailUrl, '_blank');
+        });
+
+    </script>
+</body>
+</html>
