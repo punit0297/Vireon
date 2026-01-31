@@ -3,370 +3,334 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIREON CREATOR AGENCY | Space-Age Talent Management</title>
-        <link rel="icon" type="image/png" href="logo.png">
+    <title>VIREON | Galactic Talent Systems</title>
+    <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-deep: #020205;
-            --accent-cyan: #00f2ff;
-            --accent-purple: #bc13fe;
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-white: #ffffff;
-            --text-dim: #94a3b8;
-            --gradient-main: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            --transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            --bg: #010103;
+            --cyan: #00f2ff;
+            --purple: #bc13fe;
+            --glass: rgba(255, 255, 255, 0.02);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --dim: #94a3b8;
+            --gradient: linear-gradient(135deg, var(--cyan), var(--purple));
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; cursor: none !important; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; scroll-behavior: smooth; }
+
+        /* --- JS STARFIELD CANVAS --- */
+        #space-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+
+        /* --- ADVANCED TERMINAL LOADER --- */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 99999; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1);
+        }
+        .terminal-wrap { width: 350px; text-align: left; }
+        .term-line { font-family: 'Courier New', monospace; color: var(--cyan); font-size: 0.8rem; margin-bottom: 5px; opacity: 0; transform: translateX(-10px); animation: fadeInLine 0.5s forwards; }
+        @keyframes fadeInLine { to { opacity: 1; transform: translateX(0); } }
         
-        body { 
-            background-color: var(--bg-deep); 
-            color: var(--text-white); 
-            line-height: 1.6; 
-            overflow-x: hidden; 
+        .progress-bar-wrap { width: 100%; height: 2px; background: rgba(255,255,255,0.05); margin: 20px 0; overflow: hidden; }
+        .progress-bar-fill { width: 0%; height: 100%; background: var(--cyan); box-shadow: 0 0 15px var(--cyan); transition: 0.1s; }
+        
+        #enter-btn { 
+            padding: 18px 45px; border: 1px solid var(--cyan); background: transparent; 
+            color: var(--cyan); font-weight: 800; letter-spacing: 6px; 
+            opacity: 0; transform: scale(0.9); transition: 0.5s; pointer-events: none;
         }
+        #enter-btn.ready { opacity: 1; transform: scale(1); pointer-events: auto; }
+        #enter-btn:hover { background: var(--cyan); color: #000; box-shadow: 0 0 30px var(--cyan); }
 
-        /* --- DYNAMIC BACKGROUND ANIMATION --- */
-        .bg-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(2, 2, 5, 0.8), rgba(2, 2, 5, 0.8)), url('image_209cc0.png');
-            background-size: cover; background-position: center;
-            z-index: -2; animation: bgZoom 20s infinite alternate ease-in-out;
-        }
+        /* --- CUSTOM CURSOR --- */
+        #cursor { width: 8px; height: 8px; background: #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 100000; mix-blend-mode: difference; }
+        #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--cyan); border-radius: 50%; position: fixed; pointer-events: none; z-index: 100000; transition: 0.15s ease-out; }
 
-        @keyframes bgZoom {
-            from { transform: scale(1); }
-            to { transform: scale(1.1); }
-        }
-
-        .stars-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.05) 0%, transparent 50%);
-            z-index: -1; pointer-events: none;
-        }
-
-        /* --- NAVBAR --- */
+        /* --- NAVIGATION --- */
         nav { 
-            position: fixed; top: 0; width: 100%; padding: 1.2rem 8%; 
+            position: fixed; top: 0; width: 100%; padding: 1.5rem 8%; 
             display: flex; justify-content: space-between; align-items: center; 
-            z-index: 1000; background: rgba(2, 2, 5, 0.7); 
-            backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);
-            animation: slideDown 0.8s ease;
+            z-index: 1000; backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
         }
-
-        @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-
-        .vireon-brand { display: flex; align-items: center; gap: 15px; text-decoration: none; }
-        .logo-img { height: 45px; width: auto; filter: drop-shadow(0 0 10px var(--accent-cyan)); transition: 0.3s; }
-        .logo-img:hover { transform: rotate(10deg) scale(1.1); }
-        .logo-name { font-size: 1.8rem; font-weight: 800; letter-spacing: 3px; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
-
-        .nav-links { display: flex; list-style: none; gap: 2.5rem; }
-        .nav-links a { text-decoration: none; color: var(--text-dim); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; transition: var(--transition); position: relative; }
-        .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--gradient-main); transition: 0.3s; }
-        .nav-links a:hover::after { width: 100%; }
-        .nav-links a:hover { color: var(--text-white); }
+        .logo { font-family: 'Space Grotesk'; font-size: 1.8rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 4px; }
+        .nav-links { display: flex; list-style: none; gap: 3rem; }
+        .nav-links a { text-decoration: none; color: var(--dim); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+        .nav-links a:hover { color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
 
         /* --- HERO --- */
-        .hero {
-            min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            text-align: center; padding: 0 10%; position: relative;
-        }
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .hero h1 { font-size: clamp(3rem, 10vw, 7rem); font-family: 'Space Grotesk'; line-height: 0.9; margin-bottom: 20px; text-transform: uppercase; }
+        .hero span { color: var(--cyan); text-shadow: 0 0 30px rgba(0,242,255,0.4); }
 
-        .hero h1 { 
-            font-size: clamp(3rem, 10vw, 6rem); font-weight: 800; line-height: 1.1; 
-            margin: 20px 0; animation: fadeInUp 1s ease 0.2s both;
-        }
-        .hero h1 span { background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .btn { 
-            padding: 1.2rem 2.8rem; border-radius: 50px; font-weight: 700; text-transform: uppercase; 
-            font-size: 0.85rem; letter-spacing: 2px; transition: var(--transition); 
-            cursor: pointer; border: none; display: inline-block; text-decoration: none; overflow: hidden; position: relative;
-        }
-        .btn-primary { background: var(--gradient-main); color: #000; box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); }
-        .btn-primary:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 0 50px rgba(188, 19, 254, 0.5); }
+        /* --- CREATORS --- */
+        section { padding: 120px 10%; }
+        .section-title { text-align: center; font-family: 'Space Grotesk'; font-size: 3rem; margin-bottom: 60px; letter-spacing: 2px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
         
-        .btn-outline { 
-            border: 1px solid var(--accent-cyan); color: var(--text-white); 
-            background: rgba(0, 242, 255, 0.05); margin-left: 1rem; backdrop-filter: blur(10px);
+        .card { 
+            background: var(--glass); border: 1px solid var(--border); padding: 50px 30px; 
+            border-radius: 40px; text-align: center; transition: 0.5s; backdrop-filter: blur(15px);
+            text-decoration: none; color: inherit; display: block;
         }
-        .btn-outline:hover { background: var(--accent-cyan); color: #000; }
+        .card:hover { transform: translateY(-15px) rotateX(10deg); border-color: var(--cyan); box-shadow: 0 20px 50px rgba(0,242,255,0.1); }
+        .card img { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--border); margin-bottom: 20px; transition: 0.5s; object-fit: cover; }
+        .card:hover img { border-color: var(--cyan); transform: scale(1.1) rotate(5deg); }
 
-        /* --- REVEAL ANIMATIONS --- */
-        .reveal { opacity: 0; transform: translateY(50px); transition: var(--transition); }
+        /* --- CONTACT SECTION (MISSION COMMAND) --- */
+        .contact-section { background: rgba(255,255,255,0.01); border-radius: 60px; border: 1px solid var(--border); padding: 80px 50px; }
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+        .contact-text h2 { font-family: 'Space Grotesk'; font-size: 3.5rem; line-height: 1; margin-bottom: 20px; }
+        
+        .input-group { margin-bottom: 25px; }
+        .input-group input, .input-group textarea { 
+            width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); 
+            padding: 20px; border-radius: 20px; color: #fff; outline: none; transition: 0.3s;
+        }
+        .input-group input:focus, .input-group textarea:focus { border-color: var(--cyan); background: rgba(0,242,255,0.05); }
+        .submit-btn { width: 100%; padding: 20px; border-radius: 20px; background: var(--gradient); border: none; color: #000; font-weight: 800; letter-spacing: 3px; cursor: pointer; transition: 0.4s; }
+        .submit-btn:hover { transform: scale(1.02); box-shadow: 0 0 40px var(--cyan); }
+
+        /* --- ELITE FOOTER --- */
+        footer { border-top: 1px solid var(--border); padding: 80px 10% 40px; background: #000; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 50px; margin-bottom: 60px; }
+        .footer-logo { font-family: 'Space Grotesk'; font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 20px; }
+        .footer-status { display: flex; align-items: center; gap: 10px; color: var(--cyan); font-size: 0.7rem; letter-spacing: 2px; }
+        .blinker { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; animation: blink 1.5s infinite; }
+        @keyframes blink { 50% { opacity: 0.2; } }
+        
+        .footer-links h4 { color: #fff; margin-bottom: 25px; font-size: 0.9rem; letter-spacing: 3px; }
+        .footer-links a { display: block; color: var(--dim); text-decoration: none; margin-bottom: 15px; font-size: 0.9rem; transition: 0.3s; }
+        .footer-links a:hover { color: var(--cyan); transform: translateX(8px); }
+        
+        .social-wrap { display: flex; gap: 20px; }
+        .social-icon { width: 50px; height: 50px; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--dim); transition: 0.4s; font-size: 1.2rem; }
+        .social-icon:hover { border-color: var(--purple); color: var(--purple); transform: translateY(-5px); }
+
+        .reveal { opacity: 0; transform: translateY(40px); transition: 1s cubic-bezier(0.2, 1, 0.2, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- CARDS & GRIDS --- */
-        section { padding: 120px 10% 80px; }
-        .section-header { text-align: center; margin-bottom: 5rem; }
-        .section-header h2 { font-size: 3.5rem; letter-spacing: -1px; }
-
-        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; }
-        
-        .glass-card { 
-            background: var(--glass); border: 1px solid var(--glass-border); 
-            padding: 4rem 2rem; border-radius: 40px; text-align: center; 
-            transition: var(--transition); backdrop-filter: blur(15px);
-            position: relative; overflow: hidden;
-            height: 100%;
-        }
-        .glass-card::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
-            opacity: 0; transition: 0.5s;
-        }
-        .glass-card:hover::before { opacity: 1; }
-        .glass-card:hover { border-color: var(--accent-cyan); transform: translateY(-15px) scale(1.02); }
-        
-        .glass-card i { font-size: 3rem; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 2rem; display: inline-block; }
-
-        /* NEW: Creator Link Wrapper Styles */
-        .creator-link {
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        /* --- CONTACT --- */
-        .contact-wrap { 
-            display: grid; grid-template-columns: 1fr 1.2fr; background: rgba(255,255,255,0.02); 
-            border: 1px solid var(--glass-border); border-radius: 60px; overflow: hidden; backdrop-filter: blur(20px);
-        }
-        .contact-info { padding: 5rem; background: var(--gradient-main); color: #000; position: relative; }
-        .contact-form { padding: 5rem; }
-        .input-box { 
-            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); 
-            padding: 1.5rem; border-radius: 25px; color: white; margin-bottom: 1.5rem; outline: none; transition: 0.3s;
-        }
-        .input-box:focus { border-color: var(--accent-cyan); background: rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(0,242,255,0.2); }
-
-        /* --- FOOTER --- */
-        footer { padding: 100px 10% 50px; text-align: center; border-top: 1px solid var(--glass-border); }
-        .social-links { display: flex; justify-content: center; gap: 3rem; margin: 3rem 0; }
-        .social-icon { 
-            font-size: 2rem; color: var(--text-dim); transition: var(--transition); 
-            width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; border: 1px solid var(--glass-border);
-        }
-        .social-icon:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); transform: rotate(360deg) scale(1.2); box-shadow: 0 0 20px var(--accent-cyan); }
-
-        @media (max-width: 992px) { 
-            .contact-wrap { grid-template-columns: 1fr; } 
-            .nav-links { display: none; }
-            .contact-info, .contact-form { padding: 3rem; }
-        }
+        @media (max-width: 992px) { .contact-grid, .footer-grid { grid-template-columns: 1fr; } .nav-links { display: none; } }
     </style>
 </head>
 <body>
 
-    <div class="bg-container"></div>
-    <div class="stars-overlay"></div>
+    <div id="loader">
+        <div class="terminal-wrap" id="term-box"></div>
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="bar"></div>
+        </div>
+        <button id="enter-btn">INITIALIZE CORE</button>
+    </div>
+
+    <div id="cursor"></div>
+    <div id="cursor-follower"></div>
+
+    <canvas id="space-canvas"></canvas>
 
     <nav>
-        <a href="#home" class="vireon-brand">
-            <img src="logo.png" alt="Vireon" class="logo-img">
-            <span class="logo-name">Vireon</span>
-        </a>
+        <div class="logo">VIREON</div>
         <ul class="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">Philosophy</a></li>
-            <li><a href="#creators">Talent</a></li>
+            <li><a href="#home">Terminal</a></li>
+            <li><a href="#creators">Talents</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
     </nav>
 
     <section class="hero" id="home">
-        <p class="reveal active" style="color: var(--accent-cyan); letter-spacing: 8px; font-weight: 800; text-transform: uppercase;">Established 2025</p>
-        <h1 class="reveal active">Influence Into <br><span>Galactic Impact</span></h1>
-        <p class="reveal active" style="max-width: 800px; color: #cbd5e1; font-size: 1.2rem; margin-top: 20px;">We engineering digital legacies. Connecting elite brands with the next evolution of icons through quantum-grade strategy.</p>
-        <div class="reveal active" style="margin-top: 50px;">
-            <a href="#contact" class="btn btn-primary">Start Campaign</a>
-            <a href="#creators" class="btn btn-outline">Meet the Roster</a>
-        </div>
-    </section>
-
-    <section id="about">
-        <div class="section-header reveal">
-            <p style="color: var(--accent-cyan); font-weight: 800; letter-spacing: 4px; margin-bottom: 1rem;">OUR CORE</p>
-            <h2>The Growth Ecosystem</h2>
-        </div>
-        <div class="grid-layout">
-            <div class="glass-card reveal">
-                <i class="fas fa-microchip"></i>
-                <h3>Brand Strategy</h3>
-                <p style="color: var(--text-dim);">Custom-built narrative arcs that ensure every partnership feels high-value and perfectly aligned.</p>
-            </div>
-            <div class="glass-card reveal">
-                <i class="fas fa-atom"></i>
-                <h3>Quantum Analytics</h3>
-                <p style="color: var(--text-dim);">Moving beyond vanity metrics with deep-data intelligence to track true sentiment and ROI.</p>
-            </div>
-            <div class="glass-card reveal">
-                <i class="fas fa-crown"></i>
-                <h3>Elite Management</h3>
-                <p style="color: var(--text-dim);">360° support from legal negotiation to content optimization and multi-platform scaling.</p>
-            </div>
-        </div>
+        <h1 class="reveal active">Infinite Vision.<br><span>Elite Impact.</span></h1>
+        <p class="reveal active" style="color: var(--dim); letter-spacing: 8px; font-size: 0.7rem; margin-top: 20px;">[ SCALE YOUR LEGACY ]</p>
     </section>
 
     <section id="creators">
-        <div class="section-header reveal">
-            <p style="color: var(--accent-cyan); font-weight: 800; letter-spacing: 4px; margin-bottom: 1rem;">ELITE ROSTER</p>
-            <h2>Top Tier Talent</h2>
-        </div>
-        <div class="grid-layout">
-            
-            <a href="https://flustoo.fnxnetwork.in/" target="_blank" class="creator-link">
-                <div class="glass-card reveal">
-                    <img src="flustoo.jpg" alt="flustoo" class="logo-img">
-                    <h3>Flustoo</h3>
-                    <p style="color: var(--accent-cyan); font-weight: 800;">GAMING | 67k+</p>
-                </div>
+        <h2 class="section-title reveal">The Elite Five</h2>
+        <div class="grid">
+            <a href="https://youtube.com/@flustooofficial" target="_blank" class="card reveal">
+                <img src="flustoo.jpg" alt="Flustoo">
+                <h3>Flustoo</h3>
+                <p style="color: var(--cyan); font-weight: 800; font-size: 0.7rem; margin-top: 10px;">GAMING | 67k+</p>
             </a>
-
-            <a href="https://missnovia.fnxnetwork.in/" target="_blank" class="creator-link">
-                <div class="glass-card reveal">
-                    <img src="novia.jpg" alt="novia" class="logo-img">
-                    <h3>Miss Novia</h3>
-                    <p style="color: var(--accent-cyan); font-weight: 800;">GAMING | 600k+</p>
-                </div>
+            <a href="https://youtube.com/@missnoviaofficial" target="_blank" class="card reveal">
+                <img src="novia.jpg" alt="Novia">
+                <h3>Miss Novia</h3>
+                <p style="color: var(--cyan); font-weight: 800; font-size: 0.7rem; margin-top: 10px;">GAMING | 600k+</p>
             </a>
-
-            <a href="https://youtube.com/@eveeislivee?si=1TMJ1WtZC6_GjD3X" target="_blank" class="creator-link">
-                <div class="glass-card reveal">
-                    <img src="evee.jpg" alt="evee" class="logo-img">
-                    <h3>Evee is Live</h3>
-                    <p style="color: var(--accent-cyan); font-weight: 800;">GAMING | 15K+</p>
-                </div>
+            <a href="https://youtube.com/@eveeislivee" target="_blank" class="card reveal">
+                <img src="evee.jpg" alt="Evee">
+                <h3>Evee is Live</h3>
+                <p style="color: var(--cyan); font-weight: 800; font-size: 0.7rem; margin-top: 10px;">GAMING | 15k+</p>
             </a>
-
-            <a href="https://youtube.com/@xsuitislive?si=tXKKns7s2HRPcjR2" target="_blank" class="creator-link">
-                <div class="glass-card reveal">
-                    <img src="xsuit.jpg" alt="Xsuit" class="logo-img">
-                    <h3>Xsuit is Live</h3>
-                    <p style="color: var(--accent-cyan); font-weight: 800;">GAMING | 66k+</p>
-                </div>
+            <a href="https://youtube.com/@xsuitislive" target="_blank" class="card reveal">
+                <img src="xsuit.jpg" alt="Xsuit">
+                <h3>Xsuit is Live</h3>
+                <p style="color: var(--cyan); font-weight: 800; font-size: 0.7rem; margin-top: 10px;">GAMING | 66k+</p>
             </a>
-
-            <a href="https://youtube.com/@xosizzors?si=dbIRkjo7GJOCmseR" target="_blank" class="creator-link">
-                <div class="glass-card reveal">
-                    <img src="Sizzors.jpg" alt="Sizzors" class="logo-img">
-                    <h3>Sizzors</h3>
-                    <p style="color: var(--accent-cyan); font-weight: 800;">GAMING | 2k+</p>
-                </div>
+            <a href="https://youtube.com/@xosizzors" target="_blank" class="card reveal">
+                <img src="Sizzors.jpg" alt="Sizzors">
+                <h3>Sizzors</h3>
+                <p style="color: var(--cyan); font-weight: 800; font-size: 0.7rem; margin-top: 10px;">GAMING | 2k+</p>
             </a>
-
         </div>
     </section>
 
     <section id="contact">
-        <div class="contact-wrap reveal">
-            <div class="contact-info">
-                <h2 style="font-size: 3.5rem; line-height: 1; margin-bottom: 2rem;">Launch Your Next Big Idea With Purpose</h2>
-                <p style="font-size: 1.2rem; font-weight: 600;">Ready to turn ideas into reality? We collaborate with creators, brands, and innovators to design, build, and launch powerful digital experiences. From strategy to execution, every mission is crafted with precision, creativity, and impact—because ordinary launches are never the goal, and excellence is always the standard. 🚀</p>
-                <div style="margin-top: .1rem;">
+        <div class="contact-section reveal">
+            <div class="contact-grid">
+                <div class="contact-text">
+                    <h2>Mission <br>Command.</h2>
+                    <p style="color: var(--dim); font-size: 1.1rem; margin-top: 20px;">Ready to initiate your growth protocol? Reach out to our command center for elite brand management.</p>
                 </div>
-            </div>
-            <div class="contact-form">
-                <form id="vireonEmailForm">
-                    <input type="text" id="userName" class="input-box" placeholder="Professional Name" required>
-                    <input type="email" id="userEmail" class="input-box" placeholder="Business Email" required>
-                    <textarea id="userMessage" class="input-box" rows="5" placeholder="Tell us about your mission..." required></textarea>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Initialize Mission</button>
-                </form>
+                <div class="contact-form">
+                    <form id="vireonForm">
+                        <div class="input-group">
+                            <input type="text" id="name" placeholder="Agent Name / Brand Name" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" id="email" placeholder="Communication Email" required>
+                        </div>
+                        <div class="input-group">
+                            <textarea id="msg" rows="4" placeholder="Mission Details..." required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">SEND UPLINK</button>
+                    </form>
+                </div>
             </div>
         </div>
     </section>
-<div id="enter-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer;">
-    <img src="logo.png" style="width: 120px; margin-bottom: 20px; filter: drop-shadow(0 0 15px var(--primary-green));">
-    <h2 style="font-family: 'Oswald'; color: #fff; letter-spacing: 3px;">CLICK TO ENTER</h2>
-    <p style="color: var(--primary-green); font-size: 0.7rem; margin-top: 10px; font-weight: bold;">[ MUSIC WILL ENABLE ]</p>
-</div>
 
-<div id="music-control" style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: none;">
-    <button onclick="toggleMute()" id="mute-btn" style="background: rgba(0,0,0,0.8); border: 1px solid var(--primary-green); color: var(--primary-green); padding: 12px; border-radius: 50%; cursor: pointer; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: var(--glow-shadow);">
-        <i id="mute-icon" class="fas fa-volume-up"></i>
-    </button>
-</div>
-
-<audio id="bg-music" loop>
-    <source src="ReelAudio-33862.mp3" type="audio/mpeg">
-</audio>
     <footer>
-        <div class="vireon-brand" style="justify-content: center;">
-            <img src="logo.png" alt="Vireon" class="logo-img">
-            <span class="logo-name" style="font-size: 2.5rem;">Vireon</span>
+        <div class="footer-grid">
+            <div>
+                <div class="footer-logo">VIREON</div>
+                <p style="color: var(--dim); margin-bottom: 30px;">The next-gen portal for creators who demand excellence. We build empires, not just careers.</p>
+                <div class="footer-status">
+                    <div class="blinker"></div> STATUS: OPERATIONAL / v2.0.6
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>QUICK ACTIONS</h4>
+                <a href="#home">Go to Terminal</a>
+                <a href="#creators">Talent List</a>
+                <a href="#contact">Mission Uplink</a>
+            </div>
+            <div class="footer-links">
+                <h4>CONNECT</h4>
+                <div class="social-wrap">
+                    <a href="https://instagram.com/vireon_creator" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="https://discord.gg/7SwrAJDxWF" class="social-icon"><i class="fab fa-discord"></i></a>
+                </div>
+                <p style="margin-top: 25px; color: var(--dim); font-size: 0.8rem;">p297gandhi@gmail.com</p>
+            </div>
         </div>
-        
-        <div class="social-links">
-            <a href="https://www.instagram.com/vireon_creator/" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
-            <a href="https://discord.gg/7SwrAJDxWF" target="_blank" class="social-icon"><i class="fab fa-discord"></i></a>
-        </div>
-
-        <p style="color: var(--text-dim); font-size: 0.8rem; letter-spacing: 5px; font-weight: 600; text-transform: uppercase;">&copy; 2025 VIREON CREATOR AGENCY. ALL SYSTEMS OPERATIONAL.</p>
+        <p style="text-align: center; color: rgba(255,255,255,0.05); font-size: 0.7rem; letter-spacing: 12px;">© 2026 VIREON CREATOR AGENCY</p>
     </footer>
 
+    <audio id="bg-music" loop>
+        <source src="ReelAudio-33862.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
-const music = document.getElementById('bg-music');
-const overlay = document.getElementById('enter-overlay');
-const control = document.getElementById('music-control');
-const muteIcon = document.getElementById('mute-icon');
+        // --- TERMINAL LOADER ENGINE ---
+        const termBox = document.getElementById('term-box');
+        const bar = document.getElementById('bar');
+        const enterBtn = document.getElementById('enter-btn');
+        const lines = [
+            "> Initializing Secure Tunnel...",
+            "> Fetching Talent Database...",
+            "> Syncing Galactic Coordinates...",
+            "> VIREON Core v2.0.6 Online."
+        ];
 
-// Enter click par music start
-overlay.addEventListener('click', function() {
-    music.play().catch(e => console.log("Autoplay blocked"));
-    overlay.style.opacity = '0';
-    setTimeout(() => {
-        overlay.style.display = 'none';
-        control.style.display = 'block'; // Mute button tabhi dikhega jab enter ho jaye
-    }, 500);
-});
+        let lineIdx = 0;
+        function typeTerminal() {
+            if(lineIdx < lines.length) {
+                const p = document.createElement('p');
+                p.className = 'term-line';
+                p.innerText = lines[lineIdx];
+                termBox.appendChild(p);
+                lineIdx++;
+                bar.style.width = (lineIdx / lines.length) * 100 + "%";
+                setTimeout(typeTerminal, 800);
+            } else {
+                enterBtn.classList.add('ready');
+            }
+        }
+        typeTerminal();
 
-// Mute/Unmute function
-function toggleMute() {
-    if (music.muted) {
-        music.muted = false;
-        muteIcon.className = 'fas fa-volume-up';
-        muteIcon.style.color = 'var(--primary-green)';
-    } else {
-        music.muted = true;
-        muteIcon.className = 'fas fa-volume-mute';
-        muteIcon.style.color = '#ff4444'; // Off hone par red dikhega
-    }
-}
-        // Smooth Reveal on Scroll
-        const observerOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
+        // --- SPACE WARP ENGINE ---
+        const canvas = document.getElementById('space-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        let speed = 0.5;
+
+        function initStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for(let i=0; i<450; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    z: Math.random() * canvas.width,
+                    o: Math.random()
+                });
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0,0, canvas.width, canvas.height);
+            ctx.fillStyle = "#fff";
+            stars.forEach(s => {
+                let px = (s.x - canvas.width/2) * (canvas.width/s.z) + canvas.width/2;
+                let py = (s.y - canvas.height/2) * (canvas.width/s.z) + canvas.height/2;
+                let size = (1 - s.z/canvas.width) * 3;
+                ctx.globalAlpha = s.o;
+                ctx.beginPath();
+                ctx.arc(px, py, size, 0, Math.PI*2);
+                ctx.fill();
+                s.z -= speed;
+                if(s.z <= 0) s.z = canvas.width;
             });
-        }, observerOptions);
+            requestAnimationFrame(animate);
+        }
+        initStars(); animate();
 
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-        // Form to Gmail Redirect
-        document.getElementById('vireonEmailForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const name = document.getElementById('userName').value;
-            const email = document.getElementById('userEmail').value;
-            const msg = document.getElementById('userMessage').value;
-            const subject = encodeURIComponent(`Vireon Mission Inquiry: ${name}`);
-            const body = encodeURIComponent(`Professional Name: ${name}\nEmail: ${email}\n\nMission Detail:\n${msg}`);
-            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=p297gandhi@gmail.com&su=${subject}&body=${body}`;
-            window.open(gmailUrl, '_blank');
+        // --- INTERACTION ---
+        enterBtn.addEventListener('click', () => {
+            document.getElementById('bg-music').play();
+            speed = 30; // Warp Speed Effect
+            document.getElementById('loader').style.transform = 'translateY(-100%)';
+            setTimeout(() => { speed = 0.5; }, 1200);
         });
 
+        // --- CURSOR ---
+        const cur = document.getElementById('cursor');
+        const fol = document.getElementById('cursor-follower');
+        document.addEventListener('mousemove', (e) => {
+            cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
+            fol.style.left = (e.clientX - 20) + 'px'; fol.style.top = (e.clientY - 20) + 'px';
+        });
+
+        // --- REVEAL ---
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(en => { if(en.isIntersecting) en.target.classList.add('active'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // --- CONTACT LOGIC ---
+        document.getElementById('vireonForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const n = document.getElementById('name').value;
+            const em = document.getElementById('email').value;
+            const m = document.getElementById('msg').value;
+            const url = `https://mail.google.com/mail/?view=cm&fs=1&to=p297gandhi@gmail.com&su=Vireon Uplink: ${n}&body=Agent: ${n}%0AEmail: ${em}%0A%0AMessage:%0A${m}`;
+            window.open(url, '_blank');
+        });
     </script>
 </body>
 </html>
-
-
