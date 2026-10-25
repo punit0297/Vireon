@@ -7,194 +7,258 @@
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
-            --bg: #010103;
-            --cyan: #00f2ff;
-            --purple: #bc13fe;
-            --glass: rgba(255, 255, 255, 0.02);
-            --border: rgba(255, 255, 255, 0.1);
-            --text: #ffffff;
-            --dim: #94a3b8;
-            --gradient: linear-gradient(135deg, var(--cyan), var(--purple));
+            --bg: #05061a;
+            --blue: #3d7bff;
+            --violet: #8b5cf6;
+            --ice: #cfe0ff;
+            --glass: rgba(255, 255, 255, 0.06);
+            --glass-strong: rgba(255, 255, 255, 0.1);
+            --border: rgba(180, 200, 255, 0.18);
+            --text: #f4f6ff;
+            --dim: #9aa6cf;
+            --gradient: linear-gradient(135deg, var(--blue), var(--violet));
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; cursor: none !important; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        @media (hover: hover) { * { cursor: none !important; } }
+        html { scroll-behavior: smooth; }
+        body {
+            background:
+                radial-gradient(900px 600px at 80% 8%, rgba(139, 92, 246, 0.28), transparent 60%),
+                radial-gradient(900px 700px at 10% 30%, rgba(61, 123, 255, 0.22), transparent 60%),
+                var(--bg);
+            background-attachment: fixed;
+            color: var(--text); overflow-x: hidden;
+        }
 
-        /* --- JS STARFIELD CANVAS --- */
-        #space-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-
-        /* --- ADVANCED TERMINAL LOADER --- */
+        /* --- LOADER --- */
         #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 99999; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1);
+            position: fixed; inset: 0; background: #03040f; z-index: 99999; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; transition: 1.1s cubic-bezier(0.8, 0, 0.2, 1);
         }
-        .terminal-wrap { width: 350px; text-align: left; }
-        .term-line { font-family: 'Courier New', monospace; color: var(--cyan); font-size: 0.8rem; margin-bottom: 5px; opacity: 0; transform: translateX(-10px); animation: fadeInLine 0.5s forwards; }
+        .terminal-wrap { width: 350px; max-width: 86vw; text-align: left; }
+        .term-line { font-family: 'Courier New', monospace; color: var(--ice); font-size: 0.8rem; margin-bottom: 5px; opacity: 0; transform: translateX(-10px); animation: fadeInLine 0.5s forwards; }
         @keyframes fadeInLine { to { opacity: 1; transform: translateX(0); } }
-        
-        .progress-bar-wrap { width: 100%; height: 2px; background: rgba(255,255,255,0.05); margin: 20px 0; overflow: hidden; }
-        .progress-bar-fill { width: 0%; height: 100%; background: var(--cyan); box-shadow: 0 0 15px var(--cyan); transition: 0.1s; }
-        
-        #enter-btn { 
-            padding: 18px 45px; border: 1px solid var(--cyan); background: transparent; 
-            color: var(--cyan); font-weight: 800; letter-spacing: 6px; 
-            opacity: 0; transform: scale(0.9); transition: 0.5s; pointer-events: none;
+        .progress-bar-wrap { width: 350px; max-width: 86vw; height: 2px; background: rgba(255,255,255,0.08); margin: 20px 0; overflow: hidden; }
+        .progress-bar-fill { width: 0%; height: 100%; background: var(--gradient); box-shadow: 0 0 15px var(--blue); transition: 0.3s; }
+        #enter-btn {
+            padding: 16px 42px; border: 1px solid var(--border); border-radius: 999px; background: var(--glass);
+            color: var(--ice); font-weight: 800; letter-spacing: 5px; backdrop-filter: blur(12px);
+            opacity: 0; transform: scale(0.92); transition: 0.5s; pointer-events: none;
         }
         #enter-btn.ready { opacity: 1; transform: scale(1); pointer-events: auto; }
-        #enter-btn:hover { background: var(--cyan); color: #000; box-shadow: 0 0 30px var(--cyan); }
+        #enter-btn:hover { background: var(--gradient); color: #fff; box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); }
 
-        /* --- CUSTOM CURSOR --- */
+        /* --- CURSOR --- */
         #cursor { width: 8px; height: 8px; background: #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 100000; mix-blend-mode: difference; }
-        #cursor-follower { width: 40px; height: 40px; border: 1px solid var(--cyan); border-radius: 50%; position: fixed; pointer-events: none; z-index: 100000; transition: 0.15s ease-out; }
+        #cursor-follower { width: 38px; height: 38px; border: 1px solid rgba(160, 190, 255, 0.7); border-radius: 50%; position: fixed; pointer-events: none; z-index: 100000; transition: 0.15s ease-out; }
+        @media (hover: none) { #cursor, #cursor-follower { display: none; } }
 
-        /* --- NAVIGATION --- */
-        nav { 
-            position: fixed; top: 0; width: 100%; padding: 1.5rem 8%; 
-            display: flex; justify-content: space-between; align-items: center; 
-            z-index: 1000; backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
+        /* --- NAV (glass pill) --- */
+        nav {
+            position: fixed; top: 18px; left: 50%; transform: translateX(-50%); width: min(1100px, calc(100% - 32px));
+            padding: 12px 14px 12px 26px; display: flex; justify-content: space-between; align-items: center; gap: 20px;
+            z-index: 1000; backdrop-filter: blur(22px); background: rgba(10, 12, 40, 0.55);
+            border: 1px solid var(--border); border-radius: 999px;
         }
-        .logo { font-family: 'Space Grotesk'; font-size: 1.8rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 4px; }
-        .nav-links { display: flex; list-style: none; gap: 3rem; }
-        .nav-links a { text-decoration: none; color: var(--dim); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
-        .nav-links a:hover { color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
+        .logo { font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 4px; }
+        .nav-links { display: flex; list-style: none; gap: 2.4rem; }
+        .nav-links a { text-decoration: none; color: var(--dim); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+        .nav-links a:hover { color: #fff; text-shadow: 0 0 12px var(--blue); }
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+        .lang { display: flex; gap: 2px; padding: 4px; border: 1px solid var(--border); border-radius: 999px; background: rgba(255,255,255,0.04); }
+        .lang button { background: transparent; border: none; color: var(--dim); font-size: 0.65rem; font-weight: 800; letter-spacing: 1px; padding: 6px 10px; border-radius: 999px; transition: 0.3s; }
+        .lang button.on { background: var(--gradient); color: #fff; }
+        .nav-cta { text-decoration: none; padding: 11px 22px; border-radius: 999px; background: var(--gradient); color: #fff; font-weight: 800; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; }
+        .nav-cta:hover { box-shadow: 0 0 30px rgba(139, 92, 246, 0.7); transform: translateY(-1px); }
 
         /* --- HERO --- */
-        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .hero h1 { font-size: clamp(3rem, 10vw, 7rem); font-family: 'Space Grotesk'; line-height: 0.9; margin-bottom: 20px; text-transform: uppercase; }
-        .hero span { color: var(--cyan); text-shadow: 0 0 30px rgba(0,242,255,0.4); }
+        .hero { position: relative; min-height: 100vh; display: flex; align-items: center; padding: 120px 8% 80px; overflow: hidden; }
+        #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+        .hero-copy { position: relative; z-index: 2; max-width: 620px; pointer-events: none; }
+        .hero-copy * { pointer-events: auto; }
+        .badge { display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px; border: 1px solid var(--border); border-radius: 999px; background: var(--glass); backdrop-filter: blur(14px); color: var(--ice); font-size: 0.68rem; letter-spacing: 3px; margin-bottom: 28px; }
+        .badge i { width: 7px; height: 7px; border-radius: 50%; background: #5cf2a7; box-shadow: 0 0 10px #5cf2a7; animation: blink 1.5s infinite; }
+        @keyframes blink { 50% { opacity: 0.25; } }
+        .hero h1 { font-size: clamp(2.8rem, 7.5vw, 6rem); font-family: 'Space Grotesk'; line-height: 0.95; margin-bottom: 24px; text-transform: uppercase; letter-spacing: -1px; }
+        .hero h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p.sub { color: var(--dim); font-size: 1.05rem; line-height: 1.7; max-width: 480px; margin-bottom: 36px; }
+        .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+        .btn { text-decoration: none; padding: 16px 32px; border-radius: 999px; font-weight: 800; font-size: 0.74rem; letter-spacing: 3px; text-transform: uppercase; transition: 0.4s; }
+        .btn.primary { background: var(--gradient); color: #fff; }
+        .btn.primary:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(139, 92, 246, 0.55); }
+        .btn.ghost { border: 1px solid var(--border); color: var(--ice); background: var(--glass); backdrop-filter: blur(12px); }
+        .btn.ghost:hover { border-color: #fff; transform: translateY(-3px); }
+        .scroll-hint { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 2; color: var(--dim); font-size: 0.62rem; letter-spacing: 8px; }
 
-        /* --- CREATORS --- */
-        section { padding: 120px 10%; }
-        .section-title { text-align: center; font-family: 'Space Grotesk'; font-size: 3rem; margin-bottom: 60px; letter-spacing: 2px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        
-        .card { 
-            background: var(--glass); border: 1px solid var(--border); padding: 50px 30px; 
-            border-radius: 40px; text-align: center; transition: 0.5s; backdrop-filter: blur(15px);
-            text-decoration: none; color: inherit; display: block;
+        /* draggable glass metrics */
+        .metric {
+            position: absolute; z-index: 3; width: 190px; padding: 18px 20px; border-radius: 24px;
+            background: var(--glass-strong); border: 1px solid var(--border); backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(5, 6, 40, 0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+            touch-action: none; user-select: none; -webkit-user-select: none;
         }
-        .card:hover { transform: translateY(-15px) rotateX(10deg); border-color: var(--cyan); box-shadow: 0 20px 50px rgba(0,242,255,0.1); }
-        .card img { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--border); margin-bottom: 20px; transition: 0.5s; object-fit: cover; }
-        .card:hover img { border-color: var(--cyan); transform: scale(1.1) rotate(5deg); }
+        .metric.drag { box-shadow: 0 30px 80px rgba(139, 92, 246, 0.45), inset 0 1px 0 rgba(255,255,255,0.25); transition: none; }
+        .metric small { display: block; color: var(--dim); font-size: 0.6rem; letter-spacing: 3px; margin-bottom: 8px; }
+        .metric b { font-family: 'Space Grotesk'; font-size: 1.9rem; font-weight: 700; }
+        .metric em { display: block; margin-top: 6px; font-style: normal; font-size: 0.7rem; color: #5cf2a7; }
+        #m1 { right: 8%; top: 24%; }
+        #m2 { right: 24%; bottom: 14%; }
+        #m3 { right: 4%; bottom: 30%; }
 
-        /* --- CONTACT SECTION (MISSION COMMAND) --- */
-        .contact-section { background: rgba(255,255,255,0.01); border-radius: 60px; border: 1px solid var(--border); padding: 80px 50px; }
+        /* --- SECTIONS --- */
+        section.block { padding: 120px 8%; }
+        .eyebrow { text-align: center; color: var(--blue); font-size: 0.68rem; letter-spacing: 6px; margin-bottom: 14px; }
+        .section-title { text-align: center; font-family: 'Space Grotesk'; font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 60px; letter-spacing: 1px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+
+        .card {
+            background: var(--glass); border: 1px solid var(--border); padding: 44px 26px;
+            border-radius: 32px; text-align: center; transition: 0.5s; backdrop-filter: blur(18px);
+            text-decoration: none; color: inherit; display: block; position: relative; overflow: hidden;
+        }
+        .card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(300px 200px at 50% 0%, rgba(139, 92, 246, 0.25), transparent 70%); opacity: 0; transition: 0.5s; }
+        .card:hover::before { opacity: 1; }
+        .card:hover { transform: translateY(-12px); border-color: rgba(139, 92, 246, 0.7); box-shadow: 0 24px 60px rgba(61, 123, 255, 0.18); }
+        .card img { position: relative; width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--border); margin-bottom: 20px; transition: 0.5s; object-fit: cover; }
+        .card:hover img { border-color: var(--violet); transform: scale(1.08) rotate(4deg); }
+        .card h3 { position: relative; font-family: 'Space Grotesk'; font-size: 1.25rem; }
+        .card .tag { position: relative; display: inline-block; margin-top: 14px; padding: 6px 14px; border-radius: 999px; background: rgba(61, 123, 255, 0.14); border: 1px solid rgba(61, 123, 255, 0.4); color: var(--ice); font-weight: 800; font-size: 0.66rem; letter-spacing: 1px; }
+
+        /* --- CONTACT --- */
+        .contact-section { background: var(--glass); backdrop-filter: blur(20px); border-radius: 48px; border: 1px solid var(--border); padding: 80px 50px; }
         .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-        .contact-text h2 { font-family: 'Space Grotesk'; font-size: 3.5rem; line-height: 1; margin-bottom: 20px; }
-        
-        .input-group { margin-bottom: 25px; }
-        .input-group input, .input-group textarea { 
-            width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); 
-            padding: 20px; border-radius: 20px; color: #fff; outline: none; transition: 0.3s;
-        }
-        .input-group input:focus, .input-group textarea:focus { border-color: var(--cyan); background: rgba(0,242,255,0.05); }
-        .submit-btn { width: 100%; padding: 20px; border-radius: 20px; background: var(--gradient); border: none; color: #000; font-weight: 800; letter-spacing: 3px; cursor: pointer; transition: 0.4s; }
-        .submit-btn:hover { transform: scale(1.02); box-shadow: 0 0 40px var(--cyan); }
+        .contact-text h2 { font-family: 'Space Grotesk'; font-size: clamp(2.4rem, 5vw, 3.5rem); line-height: 1; margin-bottom: 20px; }
+        .contact-text h2 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .input-group { margin-bottom: 20px; }
+        .input-group input, .input-group textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 18px 22px; border-radius: 20px; color: #fff; outline: none; transition: 0.3s; }
+        .input-group input::placeholder, .input-group textarea::placeholder { color: var(--dim); }
+        .input-group input:focus, .input-group textarea:focus { border-color: var(--blue); background: rgba(61, 123, 255, 0.08); }
+        .submit-btn { width: 100%; padding: 18px; border-radius: 999px; background: var(--gradient); border: none; color: #fff; font-weight: 800; letter-spacing: 3px; transition: 0.4s; }
+        .submit-btn:hover { transform: scale(1.02); box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); }
 
-        /* --- ELITE FOOTER --- */
-        footer { border-top: 1px solid var(--border); padding: 80px 10% 40px; background: #000; }
+        /* --- FOOTER --- */
+        footer { border-top: 1px solid var(--border); padding: 80px 8% 40px; background: rgba(3, 4, 15, 0.8); }
         .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 50px; margin-bottom: 60px; }
-        .footer-logo { font-family: 'Space Grotesk'; font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 20px; }
-        .footer-status { display: flex; align-items: center; gap: 10px; color: var(--cyan); font-size: 0.7rem; letter-spacing: 2px; }
-        .blinker { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; animation: blink 1.5s infinite; }
-        @keyframes blink { 50% { opacity: 0.2; } }
-        
-        .footer-links h4 { color: #fff; margin-bottom: 25px; font-size: 0.9rem; letter-spacing: 3px; }
-        .footer-links a { display: block; color: var(--dim); text-decoration: none; margin-bottom: 15px; font-size: 0.9rem; transition: 0.3s; }
-        .footer-links a:hover { color: var(--cyan); transform: translateX(8px); }
-        
-        .social-wrap { display: flex; gap: 20px; }
-        .social-icon { width: 50px; height: 50px; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--dim); transition: 0.4s; font-size: 1.2rem; }
-        .social-icon:hover { border-color: var(--purple); color: var(--purple); transform: translateY(-5px); }
+        .footer-logo { font-family: 'Space Grotesk'; font-size: 2.3rem; font-weight: 700; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; letter-spacing: 3px; }
+        .footer-status { display: flex; align-items: center; gap: 10px; color: var(--ice); font-size: 0.7rem; letter-spacing: 2px; }
+        .blinker { width: 8px; height: 8px; background: #5cf2a7; border-radius: 50%; animation: blink 1.5s infinite; }
+        .footer-links h4 { color: #fff; margin-bottom: 25px; font-size: 0.85rem; letter-spacing: 3px; }
+        .footer-links a.l { display: block; color: var(--dim); text-decoration: none; margin-bottom: 15px; font-size: 0.9rem; transition: 0.3s; }
+        .footer-links a.l:hover { color: #fff; transform: translateX(8px); }
+        .social-wrap { display: flex; gap: 16px; }
+        .social-icon { width: 48px; height: 48px; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--dim); text-decoration: none; transition: 0.4s; font-size: 1.15rem; background: var(--glass); }
+        .social-icon:hover { border-color: var(--violet); color: #fff; background: var(--gradient); transform: translateY(-5px); }
 
         .reveal { opacity: 0; transform: translateY(40px); transition: 1s cubic-bezier(0.2, 1, 0.2, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        @media (max-width: 992px) { .contact-grid, .footer-grid { grid-template-columns: 1fr; } .nav-links { display: none; } }
+        @media (max-width: 992px) {
+            .contact-grid, .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+            .nav-links { display: none; }
+            .contact-section { padding: 50px 24px; }
+            .metric { transform: scale(0.85); transform-origin: top left; }
+            #m1 { right: auto; left: 8%; top: auto; bottom: 22%; }
+            #m2 { right: 6%; bottom: 12%; }
+            #m3 { display: none; }
+        }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="terminal-wrap" id="term-box"></div>
-        <div class="progress-bar-wrap">
-            <div class="progress-bar-fill" id="bar"></div>
-        </div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="bar"></div></div>
         <button id="enter-btn">INITIALIZE CORE</button>
     </div>
 
     <div id="cursor"></div>
     <div id="cursor-follower"></div>
 
-    <canvas id="space-canvas"></canvas>
-
     <nav>
         <div class="logo">VIREON</div>
         <ul class="nav-links">
-            <li><a href="#home">Terminal</a></li>
-            <li><a href="#creators">Talents</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li><a href="#home" data-i18n="nav_home">Terminal</a></li>
+            <li><a href="#creators" data-i18n="nav_talents">Talents</a></li>
+            <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
         </ul>
+        <div class="nav-right">
+            <div class="lang" id="lang">
+                <button data-l="en" class="on">EN</button>
+                <button data-l="hi">हिं</button>
+                <button data-l="es">ES</button>
+            </div>
+            <a href="#contact" class="nav-cta" data-i18n="nav_cta">Get Started</a>
+        </div>
     </nav>
 
     <section class="hero" id="home">
-        <h1 class="reveal active">Infinite Vision.<br><span>Elite Impact.</span></h1>
-        <p class="reveal active" style="color: var(--dim); letter-spacing: 8px; font-size: 0.7rem; margin-top: 20px;">[ SCALE YOUR LEGACY ]</p>
+        <canvas id="hero-canvas"></canvas>
+
+        <div class="hero-copy">
+            <div class="badge reveal active"><i></i><span data-i18n="badge">GALACTIC TALENT SYSTEMS</span></div>
+            <h1 class="reveal active"><span data-i18n="h1a">Infinite Vision.</span><br><span data-i18n="h1b" style="background:none;-webkit-text-fill-color:#fff;">Elite Impact.</span></h1>
+            <p class="sub reveal active" data-i18n="sub">The next-gen portal for creators who demand excellence. We build empires, not just careers.</p>
+            <div class="hero-btns reveal active">
+                <a href="#contact" class="btn primary" data-i18n="btn1">Initiate Uplink</a>
+                <a href="#creators" class="btn ghost" data-i18n="btn2">Meet The Elite</a>
+            </div>
+        </div>
+
+        <div class="metric" id="m1"><small data-i18n="m1">ELITE CREATORS</small><b>5</b><em>▲ Active roster</em></div>
+        <div class="metric" id="m2"><small data-i18n="m2">COMBINED REACH</small><b>750k+</b><em>▲ Growing daily</em></div>
+        <div class="metric" id="m3"><small data-i18n="m3">SYSTEM STATUS</small><b>v2.0.6</b><em>● Operational</em></div>
+
+        <div class="scroll-hint">[ SCALE YOUR LEGACY ]</div>
     </section>
 
-    <section id="creators">
-        <h2 class="section-title reveal">The Elite Five</h2>
+    <section class="block" id="creators">
+        <div class="eyebrow reveal">// TALENT DATABASE</div>
+        <h2 class="section-title reveal" data-i18n="elite">The Elite Five</h2>
         <div class="grid">
             <a href="https://youtube.com/@flustooofficial" target="_blank" class="card reveal">
                 <img src="flustoo.jpg" alt="Flustoo">
                 <h3>Flustoo</h3>
-                <p style="color: var(--cyan); font-weight: 800; font-size: 0.7rem; margin-top: 10px;">GAMING | 67k+</p>
+                <span class="tag">GAMING | 67k+</span>
             </a>
             <a href="https://youtube.com/@missnoviaofficial" target="_blank" class="card reveal">
                 <img src="novia.jpg" alt="Novia">
                 <h3>Miss Novia</h3>
-                <p style="color: var(--cyan); font-weight: 800; font-size: 0.7rem; margin-top: 10px;">GAMING | 600k+</p>
+                <span class="tag">GAMING | 600k+</span>
             </a>
             <a href="https://youtube.com/@eveeislivee" target="_blank" class="card reveal">
                 <img src="evee.jpg" alt="Evee">
                 <h3>Evee is Live</h3>
-                <p style="color: var(--cyan); font-weight: 800; font-size: 0.7rem; margin-top: 10px;">GAMING | 15k+</p>
+                <span class="tag">GAMING | 15k+</span>
             </a>
             <a href="https://youtube.com/@xsuitislive" target="_blank" class="card reveal">
                 <img src="xsuit.jpg" alt="Xsuit">
                 <h3>Xsuit is Live</h3>
-                <p style="color: var(--cyan); font-weight: 800; font-size: 0.7rem; margin-top: 10px;">GAMING | 66k+</p>
+                <span class="tag">GAMING | 66k+</span>
             </a>
             <a href="https://youtube.com/@xosizzors" target="_blank" class="card reveal">
                 <img src="Sizzors.jpg" alt="Sizzors">
                 <h3>Sizzors</h3>
-                <p style="color: var(--cyan); font-weight: 800; font-size: 0.7rem; margin-top: 10px;">GAMING | 2k+</p>
+                <span class="tag">GAMING | 2k+</span>
             </a>
         </div>
     </section>
 
-    <section id="contact">
+    <section class="block" id="contact">
         <div class="contact-section reveal">
             <div class="contact-grid">
                 <div class="contact-text">
-                    <h2>Mission <br>Command.</h2>
-                    <p style="color: var(--dim); font-size: 1.1rem; margin-top: 20px;">Ready to initiate your growth protocol? Reach out to our command center for elite brand management.</p>
+                    <h2>Mission <br><span>Command.</span></h2>
+                    <p style="color: var(--dim); font-size: 1.1rem; margin-top: 20px; line-height:1.7;" data-i18n="contact_p">Ready to initiate your growth protocol? Reach out to our command center for elite brand management.</p>
                 </div>
                 <div class="contact-form">
                     <form id="vireonForm">
-                        <div class="input-group">
-                            <input type="text" id="name" placeholder="Agent Name / Brand Name" required>
-                        </div>
-                        <div class="input-group">
-                            <input type="email" id="email" placeholder="Communication Email" required>
-                        </div>
-                        <div class="input-group">
-                            <textarea id="msg" rows="4" placeholder="Mission Details..." required></textarea>
-                        </div>
+                        <div class="input-group"><input type="text" id="name" placeholder="Agent Name / Brand Name" required></div>
+                        <div class="input-group"><input type="email" id="email" placeholder="Communication Email" required></div>
+                        <div class="input-group"><textarea id="msg" rows="4" placeholder="Mission Details..." required></textarea></div>
                         <button type="submit" class="submit-btn">SEND UPLINK</button>
                     </form>
                 </div>
@@ -206,16 +270,14 @@
         <div class="footer-grid">
             <div>
                 <div class="footer-logo">VIREON</div>
-                <p style="color: var(--dim); margin-bottom: 30px;">The next-gen portal for creators who demand excellence. We build empires, not just careers.</p>
-                <div class="footer-status">
-                    <div class="blinker"></div> STATUS: OPERATIONAL / v2.0.6
-                </div>
+                <p style="color: var(--dim); margin-bottom: 30px; line-height:1.7;">The next-gen portal for creators who demand excellence. We build empires, not just careers.</p>
+                <div class="footer-status"><div class="blinker"></div> STATUS: OPERATIONAL / v2.0.6</div>
             </div>
             <div class="footer-links">
                 <h4>QUICK ACTIONS</h4>
-                <a href="#home">Go to Terminal</a>
-                <a href="#creators">Talent List</a>
-                <a href="#contact">Mission Uplink</a>
+                <a class="l" href="#home">Go to Terminal</a>
+                <a class="l" href="#creators">Talent List</a>
+                <a class="l" href="#contact">Mission Uplink</a>
             </div>
             <div class="footer-links">
                 <h4>CONNECT</h4>
@@ -226,15 +288,16 @@
                 <p style="margin-top: 25px; color: var(--dim); font-size: 0.8rem;">p297gandhi@gmail.com</p>
             </div>
         </div>
-        <p style="text-align: center; color: rgba(255,255,255,0.05); font-size: 0.7rem; letter-spacing: 12px;">© 2026 VIREON CREATOR AGENCY</p>
+        <p style="text-align: center; color: rgba(255,255,255,0.18); font-size: 0.7rem; letter-spacing: 10px;">© 2026 VIREON CREATOR AGENCY</p>
     </footer>
 
     <audio id="bg-music" loop>
         <source src="ReelAudio-33862.mp3" type="audio/mpeg">
     </audio>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r149/three.min.js"></script>
     <script>
-        // --- TERMINAL LOADER ENGINE ---
+        // --- TERMINAL LOADER ---
         const termBox = document.getElementById('term-box');
         const bar = document.getElementById('bar');
         const enterBtn = document.getElementById('enter-btn');
@@ -244,10 +307,9 @@
             "> Syncing Galactic Coordinates...",
             "> VIREON Core v2.0.6 Online."
         ];
-
         let lineIdx = 0;
         function typeTerminal() {
-            if(lineIdx < lines.length) {
+            if (lineIdx < lines.length) {
                 const p = document.createElement('p');
                 p.className = 'term-line';
                 p.innerText = lines[lineIdx];
@@ -261,74 +323,153 @@
         }
         typeTerminal();
 
-        // --- SPACE WARP ENGINE ---
-        const canvas = document.getElementById('space-canvas');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-        let speed = 0.5;
+        // --- LIQUID-METAL SCULPTURE (Three.js + GLSL) ---
+        const heroCanvas = document.getElementById('hero-canvas');
+        let warp = 0;
+        if (window.THREE) {
+            const renderer = new THREE.WebGLRenderer({ canvas: heroCanvas, antialias: true, alpha: true });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+            camera.position.z = 6;
 
-        function initStars() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            stars = [];
-            for(let i=0; i<450; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    z: Math.random() * canvas.width,
-                    o: Math.random()
-                });
-            }
-        }
-
-        function animate() {
-            ctx.fillStyle = "#000";
-            ctx.fillRect(0,0, canvas.width, canvas.height);
-            ctx.fillStyle = "#fff";
-            stars.forEach(s => {
-                let px = (s.x - canvas.width/2) * (canvas.width/s.z) + canvas.width/2;
-                let py = (s.y - canvas.height/2) * (canvas.width/s.z) + canvas.height/2;
-                let size = (1 - s.z/canvas.width) * 3;
-                ctx.globalAlpha = s.o;
-                ctx.beginPath();
-                ctx.arc(px, py, size, 0, Math.PI*2);
-                ctx.fill();
-                s.z -= speed;
-                if(s.z <= 0) s.z = canvas.width;
+            const uniforms = { uTime: { value: 0 }, uMouse: { value: new THREE.Vector2() } };
+            const mat = new THREE.ShaderMaterial({
+                uniforms,
+                vertexShader: `
+                    uniform float uTime; uniform vec2 uMouse;
+                    varying vec3 vN; varying vec3 vP;
+                    float d(vec3 p){
+                        return sin(p.x*2.2+uTime*0.8+uMouse.x)*0.5 + sin(p.y*2.8-uTime*1.0)*0.5
+                             + sin(p.z*3.1+uTime*0.7+uMouse.y)*0.5 + sin((p.x+p.y+p.z)*4.0+uTime*1.3)*0.25;
+                    }
+                    void main(){
+                        vec3 n = normalize(position);
+                        vec3 t1 = normalize(cross(n, vec3(0.0,1.0,0.01)));
+                        vec3 t2 = normalize(cross(n, t1));
+                        float e = 0.02, amp = 0.2;
+                        vec3 p0 = n + n*d(n)*amp;
+                        vec3 p1 = normalize(n+t1*e); p1 += p1*d(p1)*amp;
+                        vec3 p2 = normalize(n+t2*e); p2 += p2*d(p2)*amp;
+                        vN = normalize(normalMatrix * normalize(cross(p1-p0, p2-p0)));
+                        vec4 mv = modelViewMatrix * vec4(p0*1.55, 1.0);
+                        vP = mv.xyz;
+                        gl_Position = projectionMatrix * mv;
+                    }`,
+                fragmentShader: `
+                    uniform float uTime;
+                    varying vec3 vN; varying vec3 vP;
+                    void main(){
+                        vec3 N = normalize(vN);
+                        vec3 V = normalize(-vP);
+                        vec3 R = reflect(-V, N);
+                        float f = pow(1.0 - max(dot(N, V), 0.0), 2.5);
+                        float band = sin(R.y*7.0 + R.x*3.0 + uTime*0.6)*0.5+0.5;
+                        vec3 deep   = vec3(0.02,0.03,0.16);
+                        vec3 blue   = vec3(0.24,0.48,1.0);
+                        vec3 violet = vec3(0.55,0.36,0.96);
+                        vec3 ice    = vec3(0.85,0.92,1.0);
+                        vec3 c = mix(deep, blue, smoothstep(0.1,0.8,band));
+                        c = mix(c, violet, smoothstep(0.4,1.0,R.x*0.5+0.5)*0.8);
+                        c += ice * pow(max(R.y,0.0), 6.0) * 0.9;
+                        c += ice * smoothstep(0.92,0.98,band) * 0.5;
+                        c += mix(blue, violet, 0.5) * f * 1.2;
+                        gl_FragColor = vec4(c, 1.0);
+                    }`
             });
-            requestAnimationFrame(animate);
-        }
-        initStars(); animate();
+            const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 48), mat);
+            scene.add(mesh);
 
-        // --- INTERACTION ---
+            let mx = 0, my = 0;
+            window.addEventListener('pointermove', e => {
+                mx = (e.clientX / innerWidth - 0.5) * 2;
+                my = (e.clientY / innerHeight - 0.5) * 2;
+            });
+
+            function resize() {
+                const w = heroCanvas.clientWidth, h = heroCanvas.clientHeight;
+                renderer.setSize(w, h, false);
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                const wide = w > 992;
+                mesh.position.set(wide ? 2.1 : 0, wide ? 0 : 1.4, 0);
+                mesh.scale.setScalar(wide ? 1 : 0.75);
+            }
+            window.addEventListener('resize', resize); resize();
+
+            const clock = new THREE.Clock();
+            (function loop() {
+                const t = clock.getElapsedTime();
+                uniforms.uTime.value = t + warp;
+                uniforms.uMouse.value.lerp(new THREE.Vector2(mx, my), 0.05);
+                mesh.rotation.y += (mx * 0.4 - mesh.rotation.y) * 0.03 + 0.002;
+                mesh.rotation.x += (my * 0.25 - mesh.rotation.x) * 0.03;
+                renderer.render(scene, camera);
+                requestAnimationFrame(loop);
+            })();
+        }
+
+        // --- ENTER ---
         enterBtn.addEventListener('click', () => {
-            document.getElementById('bg-music').play();
-            speed = 30; // Warp Speed Effect
+            const a = document.getElementById('bg-music');
+            a.play().catch(() => {});
+            let n = 0; const iv = setInterval(() => { warp += 0.25; if (++n > 30) clearInterval(iv); }, 16);
             document.getElementById('loader').style.transform = 'translateY(-100%)';
-            setTimeout(() => { speed = 0.5; }, 1200);
+        });
+
+        // --- DRAGGABLE GLASS METRICS ---
+        document.querySelectorAll('.metric').forEach(el => {
+            let sx, sy, ox, oy, on = false;
+            el.addEventListener('pointerdown', e => {
+                on = true; el.setPointerCapture(e.pointerId); el.classList.add('drag');
+                const hr = el.parentElement.getBoundingClientRect(), r = el.getBoundingClientRect();
+                el.style.left = (r.left - hr.left) + 'px'; el.style.top = (r.top - hr.top) + 'px';
+                el.style.right = 'auto'; el.style.bottom = 'auto';
+                sx = e.clientX; sy = e.clientY; ox = r.left - hr.left; oy = r.top - hr.top;
+            });
+            el.addEventListener('pointermove', e => {
+                if (!on) return;
+                el.style.left = (ox + e.clientX - sx) + 'px';
+                el.style.top = (oy + e.clientY - sy) + 'px';
+            });
+            const end = () => { on = false; el.classList.remove('drag'); };
+            el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
         });
 
         // --- CURSOR ---
         const cur = document.getElementById('cursor');
         const fol = document.getElementById('cursor-follower');
-        document.addEventListener('mousemove', (e) => {
+        document.addEventListener('mousemove', e => {
             cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
-            fol.style.left = (e.clientX - 20) + 'px'; fol.style.top = (e.clientY - 20) + 'px';
+            fol.style.left = (e.clientX - 19) + 'px'; fol.style.top = (e.clientY - 19) + 'px';
         });
 
         // --- REVEAL ---
         const observer = new IntersectionObserver(entries => {
-            entries.forEach(en => { if(en.isIntersecting) en.target.classList.add('active'); });
+            entries.forEach(en => { if (en.isIntersecting) en.target.classList.add('active'); });
         }, { threshold: 0.1 });
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
+        // --- MULTILINGUAL NAV / HERO ---
+        const T = {
+            en: { nav_home:'Terminal', nav_talents:'Talents', nav_contact:'Contact', nav_cta:'Get Started', badge:'GALACTIC TALENT SYSTEMS', h1a:'Infinite Vision.', h1b:'Elite Impact.', sub:'The next-gen portal for creators who demand excellence. We build empires, not just careers.', btn1:'Initiate Uplink', btn2:'Meet The Elite', m1:'ELITE CREATORS', m2:'COMBINED REACH', m3:'SYSTEM STATUS', elite:'The Elite Five', contact_p:'Ready to initiate your growth protocol? Reach out to our command center for elite brand management.' },
+            hi: { nav_home:'टर्मिनल', nav_talents:'क्रिएटर्स', nav_contact:'संपर्क', nav_cta:'शुरू करें', badge:'गैलेक्टिक टैलेंट सिस्टम्स', h1a:'असीम विज़न।', h1b:'एलीट इम्पैक्ट।', sub:'उन क्रिएटर्स के लिए नेक्स्ट-जेन पोर्टल जो बेहतरीन चाहते हैं। हम साम्राज्य बनाते हैं, सिर्फ करियर नहीं।', btn1:'अपलिंक शुरू करें', btn2:'एलीट से मिलें', m1:'एलीट क्रिएटर्स', m2:'कुल पहुँच', m3:'सिस्टम स्टेटस', elite:'द एलीट फाइव', contact_p:'अपना ग्रोथ प्रोटोकॉल शुरू करने के लिए तैयार हैं? एलीट ब्रांड मैनेजमेंट के लिए हमारे कमांड सेंटर से संपर्क करें।' },
+            es: { nav_home:'Terminal', nav_talents:'Talentos', nav_contact:'Contacto', nav_cta:'Comenzar', badge:'SISTEMAS DE TALENTO GALÁCTICO', h1a:'Visión Infinita.', h1b:'Impacto Élite.', sub:'El portal de nueva generación para creadores que exigen excelencia. Construimos imperios, no solo carreras.', btn1:'Iniciar Enlace', btn2:'Conoce a la Élite', m1:'CREADORES ÉLITE', m2:'ALCANCE TOTAL', m3:'ESTADO DEL SISTEMA', elite:'Los Cinco de Élite', contact_p:'¿Listo para iniciar tu protocolo de crecimiento? Contacta a nuestro centro de mando para gestión de marca de élite.' }
+        };
+        function setLang(l) {
+            document.documentElement.lang = l;
+            document.querySelectorAll('[data-i18n]').forEach(el => { const v = T[l][el.dataset.i18n]; if (v) el.textContent = v; });
+            document.querySelectorAll('#lang button').forEach(b => b.classList.toggle('on', b.dataset.l === l));
+        }
+        document.querySelectorAll('#lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.l)));
+
         // --- CONTACT LOGIC ---
-        document.getElementById('vireonForm').addEventListener('submit', function(e) {
+        document.getElementById('vireonForm').addEventListener('submit', function (e) {
             e.preventDefault();
             const n = document.getElementById('name').value;
             const em = document.getElementById('email').value;
             const m = document.getElementById('msg').value;
-            const url = `https://mail.google.com/mail/?view=cm&fs=1&to=p297gandhi@gmail.com&su=Vireon Uplink: ${n}&body=Agent: ${n}%0AEmail: ${em}%0A%0AMessage:%0A${m}`;
+            const url = `https://mail.google.com/mail/?view=cm&fs=1&to=p297gandhi@gmail.com&su=${encodeURIComponent('Vireon Uplink: ' + n)}&body=${encodeURIComponent('Agent: ' + n + '\nEmail: ' + em + '\n\nMessage:\n' + m)}`;
             window.open(url, '_blank');
         });
     </script>
